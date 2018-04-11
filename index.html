@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+
+      #startpage {
+        text-align: center;
+        padding-top: 200px;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+
+	<div id=startpage>
+		<h1>Are you lost? Welcome!</h1>
+		<button onclick="welcomebutton()">Help!</button>
+	</div>
+
+    <div id="map"></div>
+    <script>
+      var map;
+      var mappage = document.getElementById("map");
+      var startpage = document.getElementById("startpage");
+      
+      mappage.style.display = "none"
+      startpage.style.display = "block"
+     
+      function welcomebutton() {
+      	mappage.style.display = "block"
+      	startpage.style.display = "none"
+      }
+
+      function ZoomControl(controlDiv, map) {
+
+		var controlWrapper = document.createElement('div');
+		/*controlWrapper.style.backgroundColor = 'white';
+		controlWrapper.style.borderStyle = 'solid';
+		controlWrapper.style.borderColor = 'gray';
+		controlWrapper.style.borderWidth = '1px';*/
+		controlWrapper.style.cursor = 'pointer';
+		controlWrapper.style.textAlign = 'center';
+		controlWrapper.style.width = '32px'; 
+		controlWrapper.style.height = '64px';
+		controlDiv.appendChild(controlWrapper);
+
+		var zoomInButton = document.createElement('div');
+		zoomInButton.style.width = '32px'; 
+		zoomInButton.style.height = '32px';
+		zoomInButton.style.backgroundImage = 'url("plus.png")';		
+		controlWrapper.appendChild(zoomInButton);
+
+		var zoomOutButton = document.createElement('div');
+		zoomOutButton.style.width = '32px'; 
+		zoomOutButton.style.height = '32px';
+		zoomOutButton.style.backgroundImage = 'url("minus.png")';
+		controlWrapper.appendChild(zoomOutButton);
+
+      	google.maps.event.addDomListener(zoomInButton, 'click', function() {
+      		map.setZoom(map.getZoom() + 1);
+      	});
+
+      	google.maps.event.addDomListener(zoomOutButton, 'click', function() {
+    	map.setZoom(map.getZoom() - 1);
+		});
+
+      }
+
+      function PanControl(controlDiv, map, myCenter) {
+
+      	var controlWrapper = document.createElement('div');
+		//controlWrapper.style.backgroundColor = 'white';
+		//controlWrapper.style.borderStyle = 'solid';
+		//controlWrapper.style.borderColor = 'gray';
+		//controlWrapper.style.borderWidth = '1px';
+		controlWrapper.style.cursor = 'pointer';
+		controlWrapper.style.textAlign = 'center';
+		controlWrapper.style.width = '32px'; 
+		controlWrapper.style.height = '64px';
+		controlDiv.appendChild(controlWrapper);
+
+		var upButton = document.createElement('div');
+		upButton.style.width = '32px'; 
+		upButton.style.height = '32px';
+		upButton.style.backgroundImage = 'url("arrow_up.png")';	
+		controlWrapper.appendChild(upButton);
+
+		var downButton = document.createElement('div');
+		downButton.style.width = '32px'; 
+		downButton.style.height = '32px';
+		downButton.style.backgroundImage = 'url("arrow_down.png")';	
+		controlWrapper.appendChild(downButton);
+
+		var leftButton = document.createElement('div');
+		leftButton.style.width = '32px'; 
+		leftButton.style.height = '32px';
+		leftButton.style.backgroundImage = 'url("arrow_left.png")';	
+		controlWrapper.appendChild(leftButton);
+
+		var rightButton = document.createElement('div');
+		rightButton.style.width = '32px'; 
+		rightButton.style.height = '32px';
+		rightButton.style.backgroundImage = 'url("arrow_right.png")';	
+		controlWrapper.appendChild(rightButton);
+
+      	google.maps.event.addDomListener(upButton, 'click', function() {
+      		myCenter.lat = myCenter.lat + 0.01; 
+      		map.setCenter(myCenter);
+      	});
+
+      	google.maps.event.addDomListener(downButton, 'click', function() {
+      		myCenter.lat = myCenter.lat - 0.01; 
+      		map.setCenter(myCenter);
+      	});
+
+      	google.maps.event.addDomListener(leftButton, 'click', function() {
+      		myCenter.lng = myCenter.lng - 0.01; 
+      		map.setCenter(myCenter);
+      	});
+
+      	google.maps.event.addDomListener(rightButton, 'click', function() {
+      		myCenter.lng = myCenter.lng + 0.01; 
+      		map.setCenter(myCenter);
+      	});
+
+      	/*google.maps.event.addDomListener(right, 'click', function() {
+      		myCenter.lng = myCenter.lng+0.01; 
+      		map.setCenter(myCenter);
+      	});
+
+      	google.maps.event.addDomListener(left, 'click', function() {
+      		myCenter.lng = myCenter.lng-0.01; 
+      		map.setCenter(myCenter);
+      	});*/
+
+      }
+
+      function initMap() {
+      	var myCenter = {lat: 59.3498092, lng: 18.0684758};
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: myCenter,
+          zoom: 15,
+          gestureHandling: 'none',
+          zoomControl: false
+        });
+
+        var marker = new google.maps.Marker({
+          position: myCenter,
+          map: map,
+          title: 'KTH!'
+        });
+
+        marker = new google.maps.Marker({
+    	map: map,
+    	draggable: true,
+    	animation: google.maps.Animation.DROP,
+    	position: {lat: 59.348242, lng: 18.071399}
+  		});
+  		
+  		marker.addListener('click', toggleBounce);
+
+		var zoomControlDiv = document.createElement('div');
+		var zoomControl = new ZoomControl(zoomControlDiv, map);
+
+		zoomControlDiv.index = 1;
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push(zoomControlDiv);
+
+		var panControlDiv = document.createElement('div');
+		var panControl = new PanControl(panControlDiv, map, myCenter);
+
+		panControlDiv.index = 1;
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(panControlDiv);
+
+	}
+
+		function toggleBounce() {
+		  if (marker.getAnimation() !== null) {
+		    marker.setAnimation(null);
+		  } else {
+		    marker.setAnimation(google.maps.Animation.BOUNCE);
+		  }
+		}
+      
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?callback=initMap"
+    async defer></script>
+  </body>
+</html>
